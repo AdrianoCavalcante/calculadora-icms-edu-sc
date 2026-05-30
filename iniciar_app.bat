@@ -2,6 +2,9 @@
 :: Script de inicialização do app IQESC
 :: Executa automaticamente o Streamlit
 
+:: Muda para o diretório do script
+cd /d "%~dp0"
+
 echo.
 echo ========================================
 echo   APP IQESC - TCE-SC (AUTOMATICO)
@@ -38,6 +41,7 @@ if errorlevel 1 (
 )
 
 echo [OK] Dependencias verificadas
+echo [OK] Diretorio: %CD%
 echo.
 echo Abrindo interface no navegador...
 echo.
@@ -48,6 +52,6 @@ echo ========================================
 echo.
 
 :: Inicia o Streamlit
-streamlit run app.py
+python -m streamlit run app.py
 
 pause
