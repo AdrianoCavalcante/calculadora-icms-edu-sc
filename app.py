@@ -6,10 +6,17 @@ import streamlit as st
 import sys
 from pathlib import Path
 
-# Adiciona o diretório src ao path
-sys.path.insert(0, str(Path(__file__).parent / "src"))
+# Adiciona o diretório src ao path (deve estar antes dos imports)
+src_path = Path(__file__).parent / "src"
+if str(src_path) not in sys.path:
+    sys.path.insert(0, str(src_path))
 
-from calculadora.calculadora_iqesc import CalculadoraIQESC
+# Import direto do módulo calculadora
+try:
+    from calculadora.calculadora_iqesc import CalculadoraIQESC
+except ImportError:
+    # Fallback: tentar import absoluto
+    from src.calculadora.calculadora_iqesc import CalculadoraIQESC
 
 # Configuração da página
 st.set_page_config(
