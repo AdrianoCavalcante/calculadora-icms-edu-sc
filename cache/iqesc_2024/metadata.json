@@ -1,0 +1,18 @@
+{
+  "ano": 2024,
+  "data_verificacao": "2026-05-30T11:31:44.091826",
+  "municipios_esperados": 288,
+  "colunas_esperadas": [
+    "",
+    "Nome do Município",
+    "Código do Município",
+    "IEO",
+    "IPA",
+    "IEE",
+    "CSE",
+    "SCE",
+    "IEN",
+    "IQESC"
+  ],
+  "estrutura_detectada": true
+}

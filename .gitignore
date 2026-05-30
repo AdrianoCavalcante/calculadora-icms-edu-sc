@@ -45,9 +45,8 @@ env/
 .ipynb_checkpoints
 *.ipynb_checkpoints/
 
-# Cache do IQESC (será baixado automaticamente)
-cache/
-!cache/.gitkeep
+# Cache do IQESC - INCLUÍDO para funcionar no Streamlit Cloud
+# O cache é recriado automaticamente quando necessário
 
 # Data files (large JSON files)
 data/raw/infraestrutura/*.json
