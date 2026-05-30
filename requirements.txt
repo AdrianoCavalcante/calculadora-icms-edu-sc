@@ -1,0 +1,14 @@
+# Web Scraping
+requests>=2.31.0
+beautifulsoup4>=4.12.0
+websocket-client>=1.6.0
+
+# Interface Web
+streamlit>=1.28.0,<2.0.0
+
+# Dados e Análise (versões compatíveis)
+numpy>=1.24.0,<2.0.0
+pandas>=2.0.0,<3.0.0
+
+# Exportação
+openpyxl>=3.1.0

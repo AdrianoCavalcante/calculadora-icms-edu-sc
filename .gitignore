@@ -1,0 +1,86 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+.pytest_cache/
+.coverage
+htmlcov/
+*.cover
+.hypothesis/
+
+# Virtual Environment
+.venv/
+.venv-1/
+venv/
+ENV/
+env/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb_checkpoints/
+
+# Cache do IQESC (será baixado automaticamente)
+cache/
+!cache/.gitkeep
+
+# Data files (large JSON files)
+data/raw/infraestrutura/*.json
+data/raw/iqesc/**/*.json
+!data/raw/infraestrutura/.gitkeep
+!data/raw/iqesc/.gitkeep
+data/processed/
+
+# Relatórios gerados
+relatorio_*.txt
+*.csv
+*.xlsx
+*.parquet
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# OS specific
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# Environment variables
+.env
+.env.local
+
+# Legacy/backup files
+*.bak
+*.backup
+*~
