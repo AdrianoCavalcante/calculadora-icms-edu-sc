@@ -12,7 +12,11 @@ if str(src_path) not in sys.path:
     sys.path.insert(0, str(src_path))
 
 # Import direto do arquivo, sem depender de __init__.py
-from calculadora.calculadora_iqesc import CalculadoraIQESC
+try:
+    from calculadora.calculadora_iqesc import CalculadoraIQESC
+except Exception as e:
+    st.error(f"❌ Erro ao importar CalculadoraIQESC: {e}")
+    st.stop()
 
 # Configuração da página
 st.set_page_config(
@@ -48,36 +52,106 @@ st.markdown("""
 @st.cache_resource
 def get_calculadora(ano, montante_icms, force_reload=False):
     """
-    Carrega calculadora com cache e download automático
+    Carrega calculadora com cache (dados já incluídos no repositório)
     
     Args:
         ano: Ano dos dados
         montante_icms: Valor total do ICMS Educacional
         force_reload: Forçar recarga (para invalidar cache)
     """
-    return CalculadoraIQESC(ano=ano, auto_download=True, montante_total_icms=montante_icms)
+    try:
+        # auto_download=False porque dados estão no repositório
+        return CalculadoraIQESC(ano=ano, auto_download=False, montante_total_icms=montante_icms)
+    except Exception as e:
+        st.error(f"❌ Erro ao carregar calculadora: {e}")
+        return None
 
 def verificar_e_carregar_dados(ano, montante_icms, forcar_atualizacao=False):
     """
-    Verifica cache e carrega dados automaticamente
+    Carrega dados do cache (já incluído no repositório)
     
     Args:
         ano: Ano dos dados
         montante_icms: Valor total do ICMS Educacional
-        forcar_atualizacao: Se True, força download mesmo com cache existente
+        forcar_atualizacao: Se True, tenta baixar dados novos do TCE-SC
     
     Returns:
         (calculadora, mensagem_status)
     """
     from pathlib import Path
-    import subprocess
-    import sys
     
     cache_dir = Path(__file__).parent / "cache" / f"iqesc_{ano}"
     dados_cache = cache_dir / "dados.json"
-    dados_legacy = Path(__file__).parent / f"iqesc_dados_{ano}.json"
     
-    # Verifica se dados existem
+    # Se forçar atualização, tenta fazer download
+    if forcar_atualizacao:
+        st.info(f"🌐 Conectando ao TCE-SC para baixar dados...")
+        
+        # Barra de progresso
+        progress_bar = st.progress(0, text="Iniciando download...")
+        
+        try:
+            import subprocess
+            import sys
+            
+            # Executa scraper
+            scraper_path = Path(__file__).parent / "src" / "iqesc_scraper_dinamico.py"
+            
+            if not scraper_path.exists():
+                progress_bar.empty()
+                return None, f"❌ Scraper não encontrado"
+            
+            progress_bar.progress(20, text="Conectando ao TCE-SC...")
+            
+            # Argumentos para o scraper
+            args = [sys.executable, str(scraper_path), str(ano), "--force-update"]
+            
+            # Executa o scraper
+            resultado = subprocess.run(
+                args,
+                capture_output=True,
+                text=True,
+                timeout=180
+            )
+            
+            progress_bar.progress(80, text="Processando dados...")
+            
+            if resultado.returncode == 0:
+                progress_bar.progress(100, text="Concluído!")
+                progress_bar.empty()
+                
+                # Tenta carregar dados baixados
+                try:
+                    calc = CalculadoraIQESC(ano=ano, auto_download=False, montante_total_icms=montante_icms)
+                    return calc, f"✅ Dados atualizados do TCE-SC"
+                except Exception as e:
+                    return None, f"❌ Erro ao carregar dados após download: {e}"
+            else:
+                progress_bar.empty()
+                
+                # Verifica se é problema de conexão ou dados não disponíveis
+                erro_output = resultado.stdout + resultado.stderr
+                if "Sem conexão" in erro_output or "connection" in erro_output.lower():
+                    return None, f"❌ Sem conexão com internet. Não é possível baixar dados para {ano}."
+                else:
+                    return None, f"❌ Não foram encontrados dados para o ano {ano} no TCE-SC.\n\nDetalhes: {resultado.stderr[:200]}"
+                    
+        except subprocess.TimeoutExpired:
+            progress_bar.empty()
+            return None, f"⚠️ Timeout ao tentar baixar dados. Tente novamente."
+        except Exception as e:
+            progress_bar.empty()
+            return None, f"❌ Erro ao baixar dados: {e}"
+    
+    # Carrega do cache (padrão)
+    try:
+        if not dados_cache.exists():
+            return None, f"❌ Dados não encontrados para o ano {ano}. Use o botão '🔄 Forçar Atualização' para baixar."
+        
+        calc = CalculadoraIQESC(ano=ano, auto_download=False, montante_total_icms=montante_icms)
+        return calc, f"✅ Dados carregados do cache local"
+    except Exception as e:
+        return None, f"❌ Erro ao carregar cache: {e}"
     dados_existem = dados_cache.exists() or dados_legacy.exists()
     
     # Se forçar atualização ou dados não existem
